@@ -7,26 +7,36 @@ Password = "cisco"
 
 def setloopback(ip, iploopback):
     Command = ["conf t", "interface loopback 0", f"ip address {iploopback} 255.255.255.255"]
-    Checkpoint = ["exit", "exit", "sh ip int br", "exit"]
-    child = pexpect.spawn('telnet ' + ip)
+    child = pexpect.spawn(f'telnet {ip}')
+    print('Authenticating...')
     child.expect('Username')
     child.sendline(Username)
     child.expect('Password')
-    child.senline(Password)
+    child.sendline(Password)
+
+    print('Enabling...')
     child.expect(PROMPT)
-    for cmd in Command: child.sendline(cmd)
-    child.sendline("exit") #exit from loopback interface
-    child.sendline("exit") #exit from priviledge mode
+    for cmd in Command:
+        print(f'-> Running "{cmd}"')
+        child.sendline(cmd)
+        child.expect(PROMPT)
+    child.sendline("exit") # exit from loopback interface
     child.expect(PROMPT)
-    child.sendline("sh ip int br")
+    child.sendline("exit") # exit from config terminal
+    child.expect(PROMPT)
+
+    print('Generating Result...')
+    child.sendline("show ip interface brief")
     child.expect(PROMPT)
     result = child.before
+    print('-'*20)
     print(result.decode('UTF-8'))
+    print('-'*20)
     child.sendline("exit") #exit from session
-    
+    print('Done!')
 
-def main():
+if __name__ == '__main__':
     for i, ip in enumerate(Devices_ip):
         iploopback = ".".join([str(i + 1)] * 4)
+        print(f'setting on {ip} with loopback {iploopback}')
         setloopback(ip, iploopback)
-main()
