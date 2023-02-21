@@ -30,8 +30,9 @@ def setloopback(ip, iploopback):
     child.expect(PROMPT)
     result = child.before
     print('-'*20)
-    print(result.decode('UTF-8'))
+    print(result.decode('UTF-8')) #show result
     print('-'*20)
+    child.sendline("wr") #save config
     child.sendline("exit") #exit from session
     print('Done!')
 
