@@ -16,21 +16,11 @@ tn.read_until(b"Password:")
 tn.write(password.encode('ascii') + b"\n")
 sleep(1)
 
-tn.write(b"conf t\n")
-sleep(1)
-tn.write(b"int g0/1\n")
-sleep(1)
-tn.write(b"ip address 172.31.116.17 255.255.255.240\n")
-sleep(2)
-tn.write(b"no sh\n")
-sleep(1)
-tn.write(b"do sh ip int br\n")
-sleep(2)
-tn.write(b"do wr\n")
-sleep(2)
-for i in range(3):
-    tn.write(b"exit\n")
-    sleep(1)
+Setupcmd = ["conf t", "int g0/1", "ip address 172.31.116.17 255.255.255.240"
+        , "no sh", "do sh ip int br", "do wr", "exit", "exit", "exit"]
+for cmd in Setupcmd:
+    tn.write((cmd + '\n').encode('ascii'))
+    sleep(2)
 
 output = tn.read_very_eager()
 print(output.decode('ascii'))
